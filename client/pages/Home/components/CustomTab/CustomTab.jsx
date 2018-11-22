@@ -53,7 +53,7 @@ export default class CustomTab extends Component {
       return;
     }
     // 显示遮罩层
-    document.getElementById('mask').style.display = 'block';
+    showMask();
     // 显示提示
     this.container.warning('请求时间较长，请耐心等待', '注意', {
       closeButton: true,
@@ -66,7 +66,7 @@ export default class CustomTab extends Component {
       .set('Accept', 'application/json')
       .then(res => {
         // 隐藏遮罩层
-        document.getElementById('mask').style.display = 'none';
+        hideMask();
         // 处理数据
         res = JSON.parse(res.text);
         if (res.code && parseInt(res.msg.total, 10)) {
@@ -124,7 +124,7 @@ export default class CustomTab extends Component {
             <div data-software="excel" onClick={this.exportTable.bind(this)} style={Object.assign(styles.excelButton)}>
               导出到excel
             </div>
-            <div data-software="word" onClick={this.exportTable} style={Object.assign(styles.wordButton)}>
+            <div data-software="word" onClick={this.exportTable.bind(this)} style={Object.assign(styles.wordButton)}>
               导出到word
             </div>
           </div>

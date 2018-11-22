@@ -104,7 +104,7 @@ export default class CompositeFilter extends Component {
         skey,
       });
       // 显示遮罩层
-      document.getElementById('mask').style.display = 'block';
+      showMask();
       // 显示提示
       this.container.warning('请求时间较长，请耐心等待', '注意', {
         closeButton: true,
@@ -118,7 +118,7 @@ export default class CompositeFilter extends Component {
         .set('Accept', 'application/json')
         .then(res => {
           // 隐藏遮罩层
-          document.getElementById('mask').style.display = 'none';
+          hideMask();
           console.log('Request Done');
           res = JSON.parse(res.text);
           console.log(res);

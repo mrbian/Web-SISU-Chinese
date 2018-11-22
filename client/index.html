@@ -24,19 +24,34 @@
 <body>
   <div id="ice-container"></div>
   <div id="mask" class="mask"></div>
+  <script>
+    /* 当前页面高度 */
+    function pageHeight() {
+      return document.body.scrollHeight;
+    }
+
+    /* 当前页面宽度 */
+    function pageWidth() {
+      return document.body.scrollWidth;
+    }
+
+    // 空滑动
+    function bodyScroll(event){
+      event.preventDefault();
+    }
+
+    function showMask(){
+      document.getElementById('mask').style.height = pageHeight() + 'px';
+      document.getElementById('mask').style.width = pageWidth() + 'px';
+      document.getElementById('mask').style.display = 'block';
+      // document.body.addEventListener('touchmove', bodyScroll, false);
+    }
+
+    function hideMask(){
+      // document.body.removeEventListener('touchmove',bodyScroll,false);
+      document.getElementById('mask').style.display = 'none';
+    }
+  </script>
 </body>
-<script>
-  /* 当前页面高度 */
-  function pageHeight() {
-    return document.body.scrollHeight;
-  }
 
-  /* 当前页面宽度 */
-  function pageWidth() {
-    return document.body.scrollWidth;
-  }
-
-  document.getElementById('mask').style.height = pageHeight() + 'px';
-  document.getElementById('mask').style.width = pageWidth() + 'px';
-</script>
 </html>
