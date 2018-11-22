@@ -1,0 +1,19 @@
+.custom-table {
+  margin-top: 10px;
+
+  .next-table-header {
+    table th {
+      background: #f4f4f4;
+      font-weight: bold;
+    }
+  }
+
+  .next-table-empty{
+    height: 300px;
+    line-height: 200px;
+  }
+
+  .next-table-cell-wrapper{
+    font-weight: bold;
+  }
+}

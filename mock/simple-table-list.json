@@ -1,0 +1,9 @@
+{
+  "status": "SUCCESS",
+  "data": {
+    "total": 0,
+    "pageSize": 6,
+    "currentPage": 1,
+    "list": []
+  }
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+  <meta name="viewport" content="width=device-width">
+  <title>上海外国语大学语料分析工具</title>
+  <style>
+    .mask{
+      z-index: 999;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      opacity: 0.5;
+      background-color: black;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="ice-container"></div>
+  <div id="mask" class="mask"></div>
+</body>
+<script>
+  /* 当前页面高度 */
+  function pageHeight() {
+    return document.body.scrollHeight;
+  }
+
+  /* 当前页面宽度 */
+  function pageWidth() {
+    return document.body.scrollWidth;
+  }
+
+  document.getElementById('mask').style.height = pageHeight() + 'px';
+  document.getElementById('mask').style.width = pageWidth() + 'px';
+</script>
+</html>
