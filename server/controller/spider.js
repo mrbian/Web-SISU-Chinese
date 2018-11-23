@@ -9,7 +9,13 @@ class SpiderController {
     }
     const limit = ctx.query.limit || 10;
     const offset = ctx.query.offset || 0;
-    const data = await spider.search(skey, limit, offset);
+    let data = await spider.search(skey, limit, offset);
+    if (data.total) {
+      data.instances = data.instances.map(ele => {
+        ele.id = parseInt(ele.id, 10);
+        return ele;
+      });
+    }
     ctx.body = {
       code: 1,
       msg: data,

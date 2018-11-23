@@ -2,7 +2,7 @@ module.exports = {
 
   bbchskConfig: {
     site: 'http://bcc.blcu.edu.cn/hsk/getRes',
-    col: '[]',
+    col: '["zh"]',
     filter: '[]',
     type: 1,
     skind: 3,

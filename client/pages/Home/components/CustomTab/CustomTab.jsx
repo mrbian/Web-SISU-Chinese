@@ -20,6 +20,13 @@ const columns = [
     title: '句子',
     key: 'pz',
     dataIndex: 'pz',
+    width: 300,
+  },
+  {
+    title: '总分',
+    key: 'zh',
+    dataIndex: 'zh',
+    width: 80,
   },
   // {
   //   title: '操作',
@@ -38,7 +45,6 @@ export default class CustomTab extends Component {
       skey: '',
       exportTableElements: [],
     };
-
   }
 
   /**
@@ -69,10 +75,18 @@ export default class CustomTab extends Component {
         hideMask();
         // 处理数据
         res = JSON.parse(res.text);
+        // 去重用数组
+        let uniqueArr = [];
         if (res.code && parseInt(res.msg.total, 10)) {
           res = res.msg.instances;
-          const elements = res.map((ele, idx) => {
-            return <tr key={idx}><td>{ele.id}</td><td>{ele.pz}</td></tr>;
+          const elements = res.filter((ele) => {
+            if (!uniqueArr[ele.id]) {
+              uniqueArr[ele.id] = 1;
+              return true;
+            }
+            return false;
+          }).map((ele, idx) => {
+            return <tr key={idx}><td>{ele.pz}</td><td>{ele.zh}</td></tr>;
           });
           self.setState({
             exportTableElements: elements,
@@ -90,7 +104,7 @@ export default class CustomTab extends Component {
   }
 
   /**
-   * 点击搜索时的回调函数
+   * 点击搜索时的回调函数，更新CustomTable的props，触发其请求数据
    * @param obj
    */
   onSearch(obj) {
@@ -133,8 +147,8 @@ export default class CustomTab extends Component {
         <table id="exportTable" style={styles.exportTable}>
           <thead>
             <tr>
-              <td>id</td>
-              <td>句子</td>
+              <th>句子</th>
+              <th>分数</th>
             </tr>
           </thead>
           <tbody>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Table, Pagination } from '@icedesign/base';
+import PropTypes from 'prop-types';
 import IceContainer from '@icedesign/container';
 
 import { enquireScreen } from 'enquire-js';
@@ -7,9 +8,15 @@ import { enquireScreen } from 'enquire-js';
 export default class SimpleTable extends Component {
   static displayName = 'SimpleTable';
 
-  static propTypes = {};
+  static propTypes = {
+    deleteItem: PropTypes.func,
+    tableData: PropTypes.array,
+  };
 
-  static defaultProps = {};
+  static defaultProps = {
+    deleteItem: () => {},
+    tableData: [],
+  };
 
   constructor(props) {
     super(props);
@@ -35,10 +42,10 @@ export default class SimpleTable extends Component {
       total: nextProps.tableData.length,
       currentPage: 1,
     }, function () {
-      console.log('In here state is changed', this.state);
+      // console.log('In here state is changed', this.state);
       this.forceUpdate();
     });
-    console.log('In here state is not changed', this.state);
+    // console.log('In here state is not changed', this.state);
   }
 
   enquireScreenRegister = () => {
@@ -58,6 +65,11 @@ export default class SimpleTable extends Component {
     });
   };
 
+  renderOperations(value, index, record) {
+    // 不能用index，因为删除后绑定的index是不变的，而实际的index是改变了的
+    return <div style={styles.operButton} onClick={() => { this.props.deleteItem(record); }} >删除</div>;
+  }
+
   render() {
     return (
       <div className="simple-table">
@@ -67,7 +79,9 @@ export default class SimpleTable extends Component {
             className="basic-table"
             hasBorder={false}
           >
-            <Table.Column title="句子" dataIndex="pz" />
+            <Table.Column title="句子" dataIndex="pz" width={320} />
+            <Table.Column title="分数" dataIndex="zh" width={85} />
+            <Table.Column title="操作" dataIndex="oper" width={85} cell={this.renderOperations.bind(this)} ></Table.Column>
           </Table>
           <div style={styles.paginationWrapper}>
             <Pagination
@@ -92,5 +106,16 @@ const styles = {
   paginationWrapper: {
     textAlign: 'center',
     paddingTop: '10px',
+  },
+  operButton: {
+    background: '#eb544c',
+    width: '32px',
+    height: '32px',
+    lineHeight: '32px',
+    textAlign: 'center',
+    borderRadius: '50px',
+    color: '#fff',
+    fontSize: '12px',
+    cursor: 'pointer',
   },
 };

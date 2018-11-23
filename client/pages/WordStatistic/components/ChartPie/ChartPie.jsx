@@ -29,13 +29,11 @@ export default class ChartPie extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.name !== this.props.name) {
-      this.setState({
-        count: nextProps.count,
-        total: nextProps.total,
-        name: nextProps.name,
-      });
-    }
+    this.setState({
+      count: nextProps.count,
+      total: nextProps.total,
+      name: nextProps.name,
+    });
   }
 
   render() {
@@ -56,7 +54,7 @@ export default class ChartPie extends Component {
     const cols = {
       percent: {
         formatter: (val) => {
-          val = `${val * 100}%`;
+          val = `${Math.round(val * 100 * 100) / 100}%`;
           return val;
         },
       },

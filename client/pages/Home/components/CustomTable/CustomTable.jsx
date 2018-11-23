@@ -52,8 +52,18 @@ export default class Home extends Component {
         res = JSON.parse(res.text);
         if (res.code && parseInt(res.msg.total, 10)) {
           const total = parseInt(res.msg.total, 10);
+          // 去重
+          let uniqueArr = [];
+          let result = res.msg.instances.filter((ele) => {
+            if (!uniqueArr[ele.id]) {
+              uniqueArr[ele.id] = 1;
+              return true;
+            } else {
+              return null;
+            }
+          });
           this.setState({
-            dataSource: res.msg.instances,
+            dataSource: result,
             total,
           });
         } else {
@@ -86,6 +96,7 @@ export default class Home extends Component {
                 title={item.title}
                 dataIndex={item.dataIndex}
                 key={item.key}
+                width={item.width}
                 sortable={item.sortable || false}
                 cell={item.cell || ((value) => value)}
               />

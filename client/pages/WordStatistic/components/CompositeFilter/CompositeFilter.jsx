@@ -127,6 +127,8 @@ export default class CompositeFilter extends Component {
             let count = 0;
             // 结果数组
             let result = [];
+            // 去重用数组
+            let uniqueArr = [];
             // 总数
             const total = parseInt(res.msg.total, 10);
             res = res.msg.instances;
@@ -134,7 +136,9 @@ export default class CompositeFilter extends Component {
             this.state.cachedRes = res;
             this.state.total = total;
             res.forEach((ele) => {
-              if (regx.test(ele.pz)) {
+              if (regx.test(ele.pz) && !uniqueArr[parseInt(ele.id, 10)]) {
+                // 设置去重数组
+                uniqueArr[parseInt(ele.id, 10)] = 1;
                 count += 1;
                 result.push(ele);
               }
