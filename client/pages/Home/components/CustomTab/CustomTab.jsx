@@ -70,6 +70,9 @@ export default class CustomTab extends Component {
       .query({ limit: 1000000 })
       .query({ offset: 0 })
       .set('Accept', 'application/json')
+      .timeout({
+        deadline: 300000,
+      })
       .then(res => {
         // 隐藏遮罩层
         hideMask();
@@ -80,8 +83,8 @@ export default class CustomTab extends Component {
         if (res.code && parseInt(res.msg.total, 10)) {
           res = res.msg.instances;
           const elements = res.filter((ele) => {
-            if (!uniqueArr[ele.id]) {
-              uniqueArr[ele.id] = 1;
+            if (!uniqueArr[parseInt(ele.id, 10)]) {
+              uniqueArr[parseInt(ele.id, 10)] = 1;
               return true;
             }
             return false;

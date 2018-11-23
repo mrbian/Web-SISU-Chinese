@@ -116,6 +116,9 @@ export default class CompositeFilter extends Component {
         .query({ limit: 1000000 })
         .query({ offset: 0 })
         .set('Accept', 'application/json')
+        .timeout({
+          deadline: 300000,
+        })
         .then(res => {
           // 隐藏遮罩层
           hideMask();

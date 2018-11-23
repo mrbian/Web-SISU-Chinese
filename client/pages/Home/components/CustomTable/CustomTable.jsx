@@ -48,6 +48,9 @@ export default class Home extends Component {
       .query({ skey: skey || this.props.skey })
       .query({ limit: this.props.limit })
       .query({ offset: (this.state.current - 1) * this.props.limit })
+      .timeout({
+        deadline: 300000,
+      })
       .then(res => {
         res = JSON.parse(res.text);
         if (res.code && parseInt(res.msg.total, 10)) {
@@ -55,8 +58,8 @@ export default class Home extends Component {
           // 去重
           let uniqueArr = [];
           let result = res.msg.instances.filter((ele) => {
-            if (!uniqueArr[ele.id]) {
-              uniqueArr[ele.id] = 1;
+            if (!uniqueArr[parseInt(ele.id, 10)]) {
+              uniqueArr[parseInt(ele.id, 10)] = 1;
               return true;
             } else {
               return null;
