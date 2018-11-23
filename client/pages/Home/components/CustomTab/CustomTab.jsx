@@ -71,7 +71,7 @@ export default class CustomTab extends Component {
       .query({ offset: 0 })
       .set('Accept', 'application/json')
       .timeout({
-        deadline: 300000,
+        deadline: 600000,
       })
       .then(res => {
         // 隐藏遮罩层

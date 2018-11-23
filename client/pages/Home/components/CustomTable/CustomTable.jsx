@@ -49,7 +49,7 @@ export default class Home extends Component {
       .query({ limit: this.props.limit })
       .query({ offset: (this.state.current - 1) * this.props.limit })
       .timeout({
-        deadline: 300000,
+        deadline: 600000,
       })
       .then(res => {
         res = JSON.parse(res.text);
