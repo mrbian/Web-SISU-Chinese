@@ -29,8 +29,6 @@ export default class CompositeFilter extends Component {
       predicateValue: '',
       objectValue: '',
       skey: '',
-      cachedRes: [],
-      total: 0,
     };
   }
 
@@ -135,21 +133,25 @@ export default class CompositeFilter extends Component {
             // 总数
             const total = parseInt(res.msg.total, 10);
             res = res.msg.instances;
-            // cache
-            this.state.cachedRes = res;
-            this.state.total = total;
-            res.forEach((ele) => {
-              if (regx.test(ele.pz) && !uniqueArr[parseInt(ele.id, 10)]) {
+            res = res.filter((ele) => {
+              if (!uniqueArr[parseInt(ele.id, 10)]) {
                 // 设置去重数组
                 uniqueArr[parseInt(ele.id, 10)] = 1;
+                return true;
+              }
+              return false;
+            });
+            // 进行筛选
+            res.forEach((ele) => {
+              if (regx.test(ele.pz)) {
                 count += 1;
                 result.push(ele);
               }
             });
-            console.log('Process Done', count, total);
+            // 更新所有数据
             this.props.onSearchDone(count, total, result, {
               skey, predicateValue, objectValue,
-            });
+            }, res);
           } else {
             alert('数据请求发生错误');
           }
@@ -157,15 +159,17 @@ export default class CompositeFilter extends Component {
     } else {
       let count = 0;
       let result = [];
-      this.state.cachedRes.forEach((ele) => {
+      console.log(this.props.cachedRes);
+      this.props.cachedRes.forEach((ele) => {
         if (regx.test(ele.pz)) {
           count += 1;
           result.push(ele);
         }
       });
-      this.props.onSearchDone(count, this.state.total, result, {
+      // 不更新total和cachedRes，只更新result、count和name
+      this.props.onSearchDone(count, null, result, {
         skey, predicateValue, objectValue,
-      });
+      }, null);
     }
   }
 

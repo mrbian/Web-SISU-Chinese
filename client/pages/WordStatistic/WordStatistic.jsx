@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Grid } from '@icedesign/base';
 import IceContainer from '@icedesign/container';
+import tableExport from 'table-export';
 import { ToastContainer } from 'react-toastr';
 import ChartPie from './components/ChartPie';
 import CompositeFilter from './components/CompositeFilter';
 import SimpleTable from './components/SimpleTable';
 import './components/CompositeFilter/toastr.scss';
-import tableExport from 'table-export';
 
 
 const { Row, Col } = Grid;
@@ -18,36 +18,55 @@ export default class WordStatistic extends Component {
     super(props);
     this.state = {
       result: [],
+      cachedRes: [],
       count: 0,
       total: 0,
       name: '谓语..宾语',
     };
   }
 
-  onSearchDone(count, total, result, sText) {
-    this.setState({
-      count,
-      total,
-      result,
-      name: `"${sText.skey}"中的"${sText.predicateValue}...${sText.objectValue}"`,
-    });
+  onSearchDone(count, total, result, sText, cachedRes) {
+    if (total && cachedRes) {
+      this.setState({
+        count,
+        total,
+        result,
+        name: `"${sText.skey}"中的"${sText.predicateValue}...${sText.objectValue}"`,
+        cachedRes,
+      });
+    } else {
+      this.setState({
+        count,
+        result,
+        name: `"${sText.skey}"中的"${sText.predicateValue}...${sText.objectValue}"`,
+      });
+    }
   }
 
   deleteItem(item) {
     const l = this.state.result.length;
-    let arr = [];
     for (let i = 0; i < l; i += 1) {
-      if (this.state.result[i].id !== item.id) {
-        arr.push(this.state.result[i]);
+      if (item.id === this.state.result[i].id) {
+        this.state.result.splice(i, 1);
+        break;
       }
     }
-    this.container.success(item.pz, '删除成功', {
-      closeButton: true,
-    });
+    const cl = this.state.cachedRes.length;
+    for (let i = 0; i < cl; i += 1) {
+      if (item.id === this.state.cachedRes[i].id) {
+        this.state.cachedRes.splice(i, 1);
+        break;
+      }
+    }
+    // 更新total和cachedRes  todo: 数据一团糟，应该全部在本文件下进行各种操作的！
     this.setState({
-      result: arr,
+      result: this.state.result,
+      cachedRes: this.state.cachedRes,
       count: this.state.count - 1,
       total: this.state.total - 1,
+    });
+    this.container.success(item.pz, '删除成功', {
+      closeButton: true,
     });
   }
 
@@ -70,7 +89,7 @@ export default class WordStatistic extends Component {
             zIndex: 1000,
           }}
         />
-        <CompositeFilter onSearchDone={this.onSearchDone.bind(this)} />
+        <CompositeFilter onSearchDone={this.onSearchDone.bind(this)} cachedRes={this.state.cachedRes} />
         <IceContainer>
           <h4 style={styles.title}>
             统计
@@ -90,14 +109,14 @@ export default class WordStatistic extends Component {
           <table id="exportTable" style={styles.exportTable}>
             <thead>
               <tr>
-                <td>句子</td>
-                <td>分数</td>
+                <td width="300px">句子</td>
+                <td width="60px">分数</td>
               </tr>
             </thead>
             <tbody>
               {
                 this.state.result.map((ele) => {
-                  return <tr><td>{ele.pz}</td><td>{ele.zh}</td></tr>;
+                  return <tr key={parseInt(ele.id, 10)}><td>{ele.pz}</td><td>{ele.zh}</td></tr>;
                 })
               }
             </tbody>
