@@ -28,6 +28,12 @@ const columns = [
     dataIndex: 'zh',
     width: 80,
   },
+  {
+    title: '证书级别',
+    key: 'jb',
+    dataIndex: 'jb',
+    width: 80,
+  },
   // {
   //   title: '操作',
   //   key: 'oper',
@@ -152,6 +158,7 @@ export default class CustomTab extends Component {
             <tr>
               <th>句子</th>
               <th>分数</th>
+              <th>证书级别</th>
             </tr>
           </thead>
           <tbody>

@@ -111,12 +111,13 @@ export default class WordStatistic extends Component {
               <tr>
                 <td width="300px">句子</td>
                 <td width="60px">分数</td>
+                <td width="60px">证书级别</td>
               </tr>
             </thead>
             <tbody>
               {
                 this.state.result.map((ele) => {
-                  return <tr key={parseInt(ele.id, 10)}><td>{ele.pz}</td><td>{ele.zh}</td></tr>;
+                  return <tr key={parseInt(ele.id, 10)}><td>{ele.pz}</td><td>{ele.zh}</td><td>{ele.jb}</td></tr>;
                 })
               }
             </tbody>

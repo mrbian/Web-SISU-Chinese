@@ -81,6 +81,7 @@ export default class SimpleTable extends Component {
           >
             <Table.Column title="句子" dataIndex="pz" width={320} />
             <Table.Column title="分数" dataIndex="zh" width={85} />
+            <Table.Column title="证书级别" dataIndex="jb" width={85} />
             <Table.Column title="操作" dataIndex="oper" width={85} cell={this.renderOperations.bind(this)} ></Table.Column>
           </Table>
           <div style={styles.paginationWrapper}>
