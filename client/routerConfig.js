@@ -6,6 +6,7 @@ import BasicLayout from './layouts/BasicLayout';
 import Home from './pages/Home';
 
 import WordStatistic from './pages/WordStatistic';
+import EditorStatistic from './pages/EditorStatistic';
 import NotFound from './pages/NotFound';
 
 const routerConfig = [
@@ -18,6 +19,11 @@ const routerConfig = [
     path: '/wordStatistic',
     layout: BasicLayout,
     component: WordStatistic,
+  },
+  {
+    path: '/editorStatistic',
+    layout: BasicLayout,
+    component: EditorStatistic,
   },
   {
     path: '*',

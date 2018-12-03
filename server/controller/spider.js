@@ -1,4 +1,5 @@
 const spider = require('../spider/spider');
+const mockData = require('../config/mock.json');
 
 class SpiderController {
   async getbbchsk(ctx) {
@@ -10,6 +11,7 @@ class SpiderController {
     const limit = ctx.query.limit || 10;
     const offset = ctx.query.offset || 0;
     let data = await spider.search(skey, limit, offset);
+    // let data = mockData;
     // 服务器性能太低
     // if (data.total) {
     //   data.instances = data.instances.map(ele => {

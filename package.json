@@ -41,6 +41,7 @@
     "@icedesign/skin": "^0.1.0",
     "@koa/cors": "^2.2.2",
     "bizcharts": "^3.4.0",
+    "braft-editor": "^1.9.8",
     "classnames": "^2.2.5",
     "echarts": "^4.1.0",
     "echarts-for-react": "^2.0.14",

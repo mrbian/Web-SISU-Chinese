@@ -94,7 +94,7 @@ export default class CompositeFilter extends Component {
     // 生成正则表达式
     const predicateValue = this.state.predicateValue;
     const objectValue = this.state.objectValue;
-    const regx = new RegExp(`(${predicateValue}(\\{[^C]\\})+[^到^\\n]*${objectValue}|${predicateValue}[^\\{^到]{1}[^到^\\n]*${objectValue}|${predicateValue}${objectValue})`, 'g');
+    const p_o_regx = new RegExp(`${predicateValue}({[^C]+})+[^到^\n]*${objectValue}|${predicateValue}[^{^到]{1}[^到^\n]*${objectValue}|${predicateValue}${objectValue}`);
 
     if (skey !== this.state.skey) {
       // 更新搜索字
@@ -143,7 +143,7 @@ export default class CompositeFilter extends Component {
             });
             // 进行筛选
             res.forEach((ele) => {
-              if (regx.test(ele.pz)) {
+              if (p_o_regx.test(ele.pz)) {
                 count += 1;
                 result.push(ele);
               }
@@ -161,7 +161,7 @@ export default class CompositeFilter extends Component {
       let result = [];
       console.log(this.props.cachedRes);
       this.props.cachedRes.forEach((ele) => {
-        if (regx.test(ele.pz)) {
+        if (p_o_regx.test(ele.pz)) {
           count += 1;
           result.push(ele);
         }

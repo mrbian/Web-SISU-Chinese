@@ -10,8 +10,13 @@ const asideMenuConfig = [
     path: '/',
   },
   {
-    name: '\u53E5\u5F0F\u5360\u6BD4\u7EDF\u8BA1',
+    name: '句式占比统计',
     path: '/wordStatistic',
+    icon: 'home',
+  },
+  {
+    name: '自定义数据统计',
+    path: '/editorStatistic',
     icon: 'home',
   },
 ];

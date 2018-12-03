@@ -4,15 +4,15 @@ import IceContainer from '@icedesign/container';
 import tableExport from 'table-export';
 import { ToastContainer } from 'react-toastr';
 import ChartPie from './components/ChartPie';
-import CompositeFilter from './components/CompositeFilter';
 import SimpleTable from './components/SimpleTable';
-import './components/CompositeFilter/toastr.scss';
-
+import BraftEditor from './components/BraftEditor';
+import './toastr.scss';
+import './EditorStatistic.scss';
 
 const { Row, Col } = Grid;
 
-export default class WordStatistic extends Component {
-  static displayName = 'WordStatistic';
+export default class EditorStatistic extends Component {
+  static displayName = 'EditorStatistic';
 
   constructor(props) {
     super(props);
@@ -23,26 +23,6 @@ export default class WordStatistic extends Component {
       total: 0,
       name: '谓语..宾语',
     };
-  }
-
-  onSearchDone(count, total, result, sText, cachedRes) {
-    // 如果所有数据全部改变
-    if (total && cachedRes) {
-      this.setState({
-        count,
-        total,
-        result,
-        name: `"${sText.skey}"中的"${sText.predicateValue}...${sText.objectValue}"`,
-        cachedRes,
-      });
-      // 如果只是更改了筛选模式
-    } else {
-      this.setState({
-        count,
-        result,
-        name: `"${sText.skey}"中的"${sText.predicateValue}...${sText.objectValue}"`,
-      });
-    }
   }
 
   deleteItem(item) {
@@ -81,9 +61,51 @@ export default class WordStatistic extends Component {
     }
   }
 
+  reset() {
+    this.setState({
+      count: 0,
+      total: 0,
+      result: [],
+      name: '谓语...宾语',
+      cachedRes: [],
+    });
+  }
+
+  /**
+   * 当编辑器开始检索
+   * @param searchModeText
+   * @param content
+   * @param predicateValue
+   * @param objectValue
+   */
+  onSearch(searchModeText, content, predicateValue, objectValue) {
+    if (searchModeText === '谓宾过滤模式') {
+      let cachedRes = content.map((ele, idx) => {
+        ele = ele.text.split(/[\s\n]+/g);
+        return {
+          id: idx,
+          pz: ele[0] || '无',
+          zh: ele[1] ? parseInt(ele[1], 10) : '无',
+          jb: ele[2] || '无',
+        };
+      });
+      const p_o_regx = new RegExp(`${predicateValue}({[^C]+})+[^到^\n]*${objectValue}|${predicateValue}[^{^到]{1}[^到^\n]*${objectValue}|${predicateValue}${objectValue}`);
+      let result = cachedRes.filter((ele) => {
+        return p_o_regx.test(ele.pz) && ele.pz !== '无';
+      });
+      this.setState({
+        total: cachedRes.length,
+        count: result.length,
+        name: `${predicateValue}...${objectValue}`,
+        cachedRes,
+        result,
+      });
+    }
+  }
+
   render() {
     return (
-      <div className="word-statistic-page">
+      <div className="editor-statistic-page">
         <ToastContainer
           ref={ref => this.container = ref}
           className="toast-top-right"
@@ -91,7 +113,7 @@ export default class WordStatistic extends Component {
             zIndex: 1000,
           }}
         />
-        <CompositeFilter onSearchDone={this.onSearchDone.bind(this)} cachedRes={this.state.cachedRes} />
+        <BraftEditor onSearch={this.onSearch.bind(this)} reset={this.reset.bind(this)} />
         <IceContainer>
           <h4 style={styles.title}>
             统计
@@ -102,26 +124,30 @@ export default class WordStatistic extends Component {
           </h4>
           <Row style={{ paddingLeft: '20px' }} wrap>
             <Col l="10">
-              <ChartPie count={this.state.count} total={this.state.total} name={this.state.name} />
+              <ChartPie count={this.state.count} total={this.state.total} name={this.state.name}/>
             </Col>
             <Col l="14">
-              <SimpleTable tableData={this.state.result} deleteItem={this.deleteItem.bind(this)} />
+              <SimpleTable tableData={this.state.result} deleteItem={this.deleteItem.bind(this)}/>
             </Col>
           </Row>
           <table id="exportTable" style={styles.exportTable}>
             <thead>
-              <tr>
-                <td width="300px">句子</td>
-                <td width="60px">分数</td>
-                <td width="60px">证书级别</td>
-              </tr>
+            <tr>
+              <td width="300px">句子</td>
+              <td width="60px">分数</td>
+              <td width="60px">证书级别</td>
+            </tr>
             </thead>
             <tbody>
-              {
-                this.state.result.map((ele) => {
-                  return <tr key={parseInt(ele.id, 10)}><td>{ele.pz}</td><td>{ele.zh}</td><td>{ele.jb}</td></tr>;
-                })
-              }
+            {
+              this.state.result.map((ele) => {
+                return <tr key={parseInt(ele.id, 10)}>
+                  <td>{ele.pz}</td>
+                  <td>{ele.zh}</td>
+                  <td>{ele.jb}</td>
+                </tr>;
+              })
+            }
             </tbody>
           </table>
         </IceContainer>
