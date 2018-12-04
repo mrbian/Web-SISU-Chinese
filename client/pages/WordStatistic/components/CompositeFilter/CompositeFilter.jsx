@@ -85,7 +85,44 @@ export default class CompositeFilter extends Component {
     );
   };
 
-  searchAndAnalyze(skey) {
+  /**
+   * 分批获取数据，一般一次1000条
+   * @param skey
+   * @param pageSize
+   * @param page
+   * @param result
+   * @param callback
+   */
+  requestData(skey, pageSize, page, result, callback) {
+    Request
+      .get('/api/bbchsk')
+      .query({ skey })
+      .query({ limit: pageSize })
+      .query({ offset: (page - 1) * pageSize })
+      .set('Accept', 'application/json')
+      .timeout({
+        deadline: 600000,
+      })
+      .then(res => {
+        res = JSON.parse(res.text);
+        const total = parseInt(res.msg.total, 10);
+        if (res.code === 0 || total === 0) {
+          alert('数据请求发生错误');
+          callback(total, result);
+          return;
+        }
+        result.push(...res.msg.instances);
+        this.container.success(`共有${total}条数据，已请求${(pageSize * page) < total ? Math.round(100 * (page * pageSize) / total) : 100}％`);
+        if (total < pageSize || pageSize * page >= total) {
+          // 不向下请求就是结束，
+          callback(total, result);
+        } else {
+          this.requestData(skey, pageSize, page + 1, result, callback);
+        }
+      });
+  }
+
+  async searchAndAnalyze(skey) {
     if (!skey || !this.state.predicateValue || !this.state.objectValue) {
       alert('值不合法，请检查是否为空');
       return;
@@ -107,59 +144,40 @@ export default class CompositeFilter extends Component {
       this.container.warning('请求时间较长，请耐心等待', '注意', {
         closeButton: true,
       });
-      // 获取数据并进行筛选
-      Request
-        .get('/api/bbchsk')
-        .query({ skey })
-        .query({ limit: 1000000 })
-        .query({ offset: 0 })
-        .set('Accept', 'application/json')
-        .timeout({
-          deadline: 600000,
-        })
-        .then(res => {
-          // 隐藏遮罩层
-          hideMask();
-          console.log('Request Done');
-          res = JSON.parse(res.text);
-          console.log(res);
-          if (res.code && parseInt(res.msg.total, 10)) {
-            // 符合要求的个数
-            let count = 0;
-            // 结果数组
-            let result = [];
-            // 去重用数组
-            let uniqueArr = [];
-            // 总数
-            const total = parseInt(res.msg.total, 10);
-            res = res.msg.instances;
-            res = res.filter((ele) => {
-              if (!uniqueArr[parseInt(ele.id, 10)]) {
-                // 设置去重数组
-                uniqueArr[parseInt(ele.id, 10)] = 1;
-                return true;
-              }
-              return false;
-            });
-            // 进行筛选
-            res.forEach((ele) => {
-              if (p_o_regx.test(ele.pz)) {
-                count += 1;
-                result.push(ele);
-              }
-            });
-            // 更新所有数据
-            this.props.onSearchDone(count, total, result, {
-              skey, predicateValue, objectValue,
-            }, res);
-          } else {
-            alert('数据请求发生错误');
+
+      const self = this;
+      this.requestData(skey, 1000, 1, [], (total, resultArr) => {
+        // 隐藏遮罩层
+        hideMask();
+        // 符合要求的个数
+        let count = 0;
+        // 去重用数组
+        let uniqueArr = [];
+        // 展示用数组
+        let result = [];
+        resultArr = resultArr.filter((ele) => {
+          if (!uniqueArr[parseInt(ele.id, 10)]) {
+            // 设置去重数组
+            uniqueArr[parseInt(ele.id, 10)] = 1;
+            return true;
+          }
+          return false;
+        });
+        // 进行筛选
+        resultArr.forEach((ele) => {
+          if (p_o_regx.test(ele.pz)) {
+            count += 1;
+            result.push(ele);
           }
         });
+        // 更新所有数据
+        self.props.onSearchDone(count, total, result, {
+          skey, predicateValue, objectValue,
+        }, resultArr);
+      });
     } else {
       let count = 0;
       let result = [];
-      console.log(this.props.cachedRes);
       this.props.cachedRes.forEach((ele) => {
         if (p_o_regx.test(ele.pz)) {
           count += 1;

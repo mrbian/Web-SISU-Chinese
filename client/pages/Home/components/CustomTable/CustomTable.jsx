@@ -76,11 +76,11 @@ export default class Home extends Component {
   }
 
   handlePagination = (current) => {
-    console.log(current);
     this.setState({
       current,
+    },() => {
+      this.refreshData();
     });
-    this.refreshData();
   };
 
   render() {

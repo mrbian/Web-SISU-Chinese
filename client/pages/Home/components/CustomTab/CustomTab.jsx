@@ -54,6 +54,43 @@ export default class CustomTab extends Component {
   }
 
   /**
+   * 分批获取数据，一般一次1000条
+   * @param skey
+   * @param pageSize
+   * @param page
+   * @param result
+   * @param callback
+   */
+  requestData(skey, pageSize, page, result, callback) {
+    Request
+      .get('/api/bbchsk')
+      .query({ skey })
+      .query({ limit: pageSize })
+      .query({ offset: (page - 1) * pageSize })
+      .set('Accept', 'application/json')
+      .timeout({
+        deadline: 600000,
+      })
+      .then(res => {
+        res = JSON.parse(res.text);
+        const total = parseInt(res.msg.total, 10);
+        if (res.code === 0 || total === 0) {
+          alert('数据请求发生错误');
+          callback(total, result);
+          return;
+        }
+        result.push(...res.msg.instances);
+        this.container.success(`共有${total}条数据，已请求${(pageSize * page) < total ? Math.round(100 * (page * pageSize) / total) : 100}％`);
+        if (total < pageSize || pageSize * page >= total) {
+          // 不向下请求就是结束，
+          callback(total, result);
+        } else {
+          this.requestData(skey, pageSize, page + 1, result, callback);
+        }
+      });
+  }
+
+  /**
    * 导出搜索
    * @param event
    */
@@ -70,46 +107,29 @@ export default class CustomTab extends Component {
     this.container.warning('请求时间较长，请耐心等待', '注意', {
       closeButton: true,
     });
-    Request
-      .get('/api/bbchsk')
-      .query({ skey: self.state.skey })
-      .query({ limit: 1000000 })
-      .query({ offset: 0 })
-      .set('Accept', 'application/json')
-      .timeout({
-        deadline: 600000,
-      })
-      .then(res => {
-        // 隐藏遮罩层
-        hideMask();
-        // 处理数据
-        res = JSON.parse(res.text);
-        // 去重用数组
-        let uniqueArr = [];
-        if (res.code && parseInt(res.msg.total, 10)) {
-          res = res.msg.instances;
-          const elements = res.filter((ele) => {
-            if (!uniqueArr[parseInt(ele.id, 10)]) {
-              uniqueArr[parseInt(ele.id, 10)] = 1;
-              return true;
-            }
-            return false;
-          }).map((ele, idx) => {
-            return <tr key={idx}><td>{ele.pz}</td><td>{ele.zh}</td></tr>;
-          });
-          self.setState({
-            exportTableElements: elements,
-          });
-          console.log('Done');
-          if (isExcel) {
-            tableExport('exportTable', `"${self.state.skey}"语料库`, 'xls');
-          } else {
-            tableExport('exportTable', `"${self.state.skey}"语料库`, 'doc');
-          }
-        } else {
-          alert('数据请求发生错误');
+    this.requestData(self.state.skey, 1000, 1, [], (total, resultArr) => {
+      // 隐藏遮罩层
+      hideMask();
+      // 去重用数组
+      let uniqueArr = [];
+      const elements = resultArr.filter((ele) => {
+        if (!uniqueArr[parseInt(ele.id, 10)]) {
+          uniqueArr[parseInt(ele.id, 10)] = 1;
+          return true;
         }
+        return false;
+      }).map((ele, idx) => {
+        return <tr key={idx}><td>{ele.pz}</td><td>{ele.zh}</td><td>{ele.jb}</td></tr>;
       });
+      self.setState({
+        exportTableElements: elements,
+      });
+      if (isExcel) {
+        tableExport('exportTable', `"${self.state.skey}"语料库`, 'xls');
+      } else {
+        tableExport('exportTable', `"${self.state.skey}"语料库`, 'doc');
+      }
+    });
   }
 
   /**
